@@ -76,3 +76,13 @@ Scenes: syringe, measles spots, US / Mexico (Baja) / Bolivia silhouettes; sun, A
 Checked on `entry.png`: masthead, 2030, 330 and 56-44 read; main headlines and deks are intact; the also list runs 13–40. File is 1024×1024, palette, 123 colours, 90,756 bytes.
 
 Next: numbered world map from `lat`/`lon`, then spot-check the date and headlines at 300px. Do not add Tuesday events.
+
+## Session 3c — where it happened
+
+`build/landmask.mjs` is a 90×40 equirectangular mask from 75N to 56S (`#` land, `.` sea, no Antarctica). `build/map.mjs` draws one dot per land cell and red numbered pins for stories 1–12. Leader offsets keep Shenzhen (1 and 4) and the Washington/New York cluster (5, 7, 9, 11) from sitting on the same badge.
+
+The bottom band is 45/55: the map on the left, the also-list on the right. One-line legend: "Asia 1·4·12 · Gulf 2 · Americas 3·5-7·9·11 · Europe 8·10".
+
+Checked on `entry.png`: the Americas, Europe, Africa, Asia and Australia read as separate shapes; each pin's dot is on that story's coast and the badges do not cover one another; the legend sits in the margin under the map. A 300px shrink still shows the masthead. File is 1024×1024, palette, 123 colours, 104,938 bytes.
+
+Next (session 4): fact pass against `data/stories.json` only, crush the palette PNG, confirm the gate, short README. Do not add Tuesday events. Spot-check card headlines at 300px while doing that.

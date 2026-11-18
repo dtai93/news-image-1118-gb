@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artFor } from './art/index.mjs';
+import { mapSvg, MAP_LEGEND } from './map.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { stories } = JSON.parse(readFileSync(join(root, 'data/stories.json'), 'utf8'));
@@ -57,12 +58,12 @@ html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:#f4efe6
   font-size:16px;line-height:20px;white-space:nowrap;overflow:hidden}
 .main h3{margin:0;font-size:16px;line-height:18px;font-weight:700;white-space:nowrap;overflow:hidden}
 .dek{margin:0;font-size:11px;line-height:13px;max-height:26px;overflow:hidden}
-.band{display:grid;grid-template-columns:360px 1fr;gap:8px;min-height:0}
+.band{display:grid;grid-template-columns:45fr 55fr;gap:6px;min-height:0}
 .map,.also{border:1px solid #1c140e;background:#fbf7f0;min-height:0;display:flex;flex-direction:column;padding:4px 6px 4px}
 .sec{margin:0;height:16px;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.06em}
-.map-frame{flex:1;min-height:0;background:#efe4cf;position:relative;margin-top:3px}
+.map-frame{flex:1;min-height:0;background:#d7e3ea;position:relative;margin-top:2px}
 .map-frame svg{display:block;width:100%;height:100%}
-.map-cap{position:absolute;left:8px;bottom:6px;margin:0;font-size:12px;line-height:14px;font-weight:700}
+.map-cap{position:absolute;left:4px;right:4px;bottom:1px;margin:0;font-size:11px;line-height:13px;font-weight:700;white-space:nowrap;overflow:hidden}
 .also-cols{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0 10px;min-height:0;margin-top:2px}
 .also-col+.also-col{border-left:1px solid #1c140e;padding-left:8px}
 .also-item{margin:0;font-size:12px;line-height:16px;height:16px;white-space:nowrap;overflow:hidden}
@@ -73,13 +74,13 @@ html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:#f4efe6
 .foot .note b{color:#8f1d1a}
 `;
 
-const mapSvg = `<svg viewBox="0 0 360 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="360" height="240" fill="#efe4cf"/><ellipse cx="180" cy="112" rx="150" ry="70" fill="none" stroke="#1c140e" stroke-width="2"/><ellipse cx="180" cy="112" rx="70" ry="70" fill="none" stroke="#1c140e" stroke-width="1"/><path d="M30 112 H330 M180 42 V182" fill="none" stroke="#1c140e" stroke-width="1"/></svg>`;
+const world = mapSvg(stories);
 
 const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Wednesday 18 November 2026</title><style>${css}</style></head><body><div class="page">
 <header class="mast"><div class="kicker"><b>THE DAY IN WORLD NEWS</b><span>${stories.length} STORIES · 6 CONTINENTS</span></div><h1 class="date">Wednesday 18 November 2026</h1><div class="rules"></div></header>
 <section class="leads">${leads.map((s) => card(s, 'lead')).join('')}</section>
 <section class="mains">${mains.map((s) => card(s, 'main')).join('')}</section>
-<section class="band"><aside class="map"><p class="sec">WHERE IT HAPPENED</p><div class="map-frame">${mapSvg}<p class="map-cap">40 datelines</p></div></aside>
+<section class="band"><aside class="map"><p class="sec">WHERE IT HAPPENED</p><div class="map-frame">${world}<p class="map-cap">${MAP_LEGEND}</p></div></aside>
 <section class="also"><p class="sec">ALSO ON WEDNESDAY 18 NOVEMBER</p><div class="also-cols"><div class="also-col">${alsoCol(also.slice(0, mid))}</div><div class="also-col">${alsoCol(also.slice(mid))}</div></div></section></section>
 <footer class="foot"><p>${esc(srcLine)}</p><p class="note"><b>JUDGE NOTE</b> Wednesday 18 November 2026 only. Disputed claims stay attributed to the outlet that reported them.</p></footer>
 </div></body></html>`;
