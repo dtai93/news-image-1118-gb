@@ -8,7 +8,19 @@ raw = ROOT / "build" / "raw.png"
 out = ROOT / "entry.png"
 
 # Flat inks median-cut drops when only a few dozen pixels use them.
-PINS = [(240, 196, 0), (26, 86, 196)]  # flag gold, Korea blue
+# Flag gold, Korea blue, and the field-key colours.
+PINS = [
+    (240, 196, 0),
+    (26, 86, 196),
+    (26, 79, 139),
+    (143, 29, 26),
+    (29, 107, 58),
+    (107, 63, 160),
+    (196, 92, 18),
+    (14, 124, 107),
+    (61, 52, 40),
+    (166, 124, 0),
+]
 
 im = Image.open(raw).convert("RGB")
 if im.size != (1024, 1024):

@@ -86,3 +86,15 @@ The bottom band is 45/55: the map on the left, the also-list on the right. One-l
 Checked on `entry.png`: the Americas, Europe, Africa, Asia and Australia read as separate shapes; each pin's dot is on that story's coast and the badges do not cover one another; the legend sits in the margin under the map. A 300px shrink still shows the masthead. File is 1024×1024, palette, 123 colours, 104,938 bytes.
 
 Next (session 4): fact pass against `data/stories.json` only, crush the palette PNG, confirm the gate, short README. Do not add Tuesday events. Spot-check card headlines at 300px while doing that.
+
+## Session 4 done
+
+Fact pass stayed inside `data/stories.json`. No Tuesday events added. Kuwait's lead dek no longer mentions the Tuesday Qeshm strikes; it only says Kuwait reported countering drones on 18 November. Headlines that are someone else's claim already say so (Kuwait, PAHO, Trump, the Justice Department, Bilawal, Pope Leo, Rubio).
+
+Masthead is "Wednesday 18 November 2026" and "40 STORIES · 6 CONTINENTS" (40 stories; Africa, Asia, Europe, North America, South America via Bolivia, Oceania via Australia). Footer: full source list plus "Original drawings." Judge note still dates the day and says disputed claims are attributed.
+
+Drawings: US shape now has the Florida and Texas points, Mexico keeps a separate Baja, Australia has Cape York, the gulf bite, and Tasmania, and the Korea card's peninsula reads as a peninsula. "56-44" stays on one line.
+
+`entry.png` is a palette PNG, 1024×1024, 107,572 bytes. `mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts` matches `entry.png` on two runs. `out/` is gitignored. README is the make.fun template.
+
+Pushed to origin main. A later session should change the picture only if a grade names a specific miss.

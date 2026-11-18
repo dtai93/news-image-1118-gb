@@ -45,8 +45,8 @@ export function s8() {
 <rect width="320" height="65" fill="${C}"/>
 ${rays(40, 34, 16, 28)}
 <circle cx="40" cy="34" r="13" fill="${Y}" stroke="${I}" stroke-width="1.5"/>
-<path d="M92 24 L122 12 L150 14 L166 24 L154 28 L168 36 L170 48 L150 56 L112 58 L92 48 L84 34 Z" fill="${I}"/>
-<rect x="148" y="56" width="7" height="5" fill="${I}"/>
+<path d="M108 34 L100 20 L112 12 L120 2 L128 14 L140 10 L132 28 L150 16 L168 20 L174 34 L164 50 L136 56 L110 52 L98 40 Z" fill="${I}"/>
+<path d="M150 54 L164 52 L168 62 L152 63 Z" fill="${I}"/>
 <rect x="196" y="6" width="116" height="52" fill="${W}" stroke="${I}" stroke-width="1.6"/>
 <rect x="196" y="6" width="116" height="10" fill="${R}"/>
 ${segs(2030, 214, 22, 30, I)}

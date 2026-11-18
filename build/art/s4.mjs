@@ -60,7 +60,7 @@ export function s4() {
 <rect width="320" height="65" fill="${C}"/>
 ${china(2, 8, 72, 48)}
 ${korea(78, 8)}
-<path d="M174 4 L184 10 L186 26 L194 38 L188 52 L180 62 L166 60 L160 44 L166 28 L164 12 Z" fill="${I}"/>
+<path d="M170 4 L178 8 L180 22 L188 36 L194 50 L186 62 L172 60 L164 46 L166 30 L162 16 L166 8 Z" fill="${I}"/>
 <rect x="204" y="32" width="108" height="4" fill="${I}"/>
 ${chip(206)}${chip(244)}${chip(282)}
 </svg>`;
