@@ -11,7 +11,8 @@ from scenes import paint_scene
 
 ROOT = Path(__file__).resolve().parent.parent
 INK = (28, 20, 14)
-MUTED = (72, 62, 54)
+HEAD = (12, 8, 6)
+MUTED = (48, 38, 30)
 PAPER = (244, 239, 230)
 CREAM = (251, 247, 240)
 RUST = (158, 42, 32)
@@ -120,14 +121,23 @@ def wrap(d, text, font, max_w):
     return lines
 
 
-def fit(path, text, max_w, start, minimum, draw):
+def font(path, size, weight=700):
+    face_font = ImageFont.truetype(path, size)
+    try:
+        face_font.set_variation_by_axes([int(weight)])
+    except OSError:
+        pass
+    return face_font
+
+
+def fit(path, text, max_w, start, minimum, draw, weight=700):
     size = start
     while size > minimum:
-        font = ImageFont.truetype(path, size)
-        if all(draw.textlength(line, font=font) <= max_w for line in text.split("\n")):
-            return font
+        chosen = font(path, size, weight)
+        if all(draw.textlength(line, font=chosen) <= max_w for line in text.split("\n")):
+            return chosen
         size -= 1
-    return ImageFont.truetype(path, minimum)
+    return font(path, minimum, weight)
 
 
 def load():
@@ -159,10 +169,10 @@ def chip(d, right, top, label, font):
     d.text((x + 4, top + 4), label, font=font, fill=WHITE)
 
 
-def tag(d, x, y, story, path, max_w):
+def tag(d, x, y, story, path, max_w, start):
     region = {"NORTH AMERICA": "N. AMERICA", "MIDDLE EAST": "M. EAST"}.get(story["region"], story["region"])
     label = f"{story['num']}  {region} · {story['field']}"
-    font = fit(path, label, max_w, 12, 8, d)
+    font = fit(path, label, max_w, start, 8, d, 700)
     n = f"{story['num']}  "
     d.text((x, y), n, font=font, fill=rcol(story["region"]))
     x += d.textlength(n, font=font)
@@ -170,6 +180,7 @@ def tag(d, x, y, story, path, max_w):
     d.text((x, y), reg, font=font, fill=rcol(story["region"]))
     x += d.textlength(reg, font=font)
     d.text((x, y), story["field"], font=font, fill=FIELD.get(story["field"], INK))
+    return font
 
 
 def card(base, _d, box, story, fonts, lead):
@@ -179,7 +190,7 @@ def card(base, _d, box, story, fonts, lead):
     col = rcol(story["region"])
     d.rounded_rectangle((0, 0, w - 1, h - 1), radius=4, fill=CREAM, outline=col, width=2)
     cap, chip_l, hl, dek = CARD[story["n"]]
-    text_h = 98 if lead else 76
+    text_h = 98 if lead else 92
     art_h = max(44, h - text_h)
     art = (3, 3, w - 6, art_h)
     # Scene stops above the caption strip so picture text cannot be clipped by it.
@@ -189,16 +200,17 @@ def card(base, _d, box, story, fonts, lead):
     caption(d, art, cap, cfont)
     chip(d, w - 3, 3, chip_l, fonts["chip"])
     ty = 5 + art_h
-    tag(d, 6, ty, story, fonts["sansb"], w - 14)
-    hf = fit(fonts["serif"], hl, w - 14, 21 if lead else 14, 11, d)
+    tf = tag(d, 6, ty, story, fonts["sansb"], w - 14, 13 if lead else 11)
+    top = ty + tf.size + 1
+    hf = fit(fonts["serif"], hl, w - 14, 22 if lead else 15, 11, d, 900)
     for i, line in enumerate(hl.split("\n")[:2]):
-        d.text((6, ty + 13 + i * (hf.size + 1)), line, font=hf, fill=INK)
-    dy = ty + 13 + 2 * (hf.size + 1) + 1
+        d.text((6, top + i * (hf.size + 1)), line, font=hf, fill=HEAD)
+    dy = top + 2 * (hf.size + 1) + 1
     df = fonts["dek"] if lead else fonts["dek_s"]
-    for i, line in enumerate(wrap(d, dek, df, w - 14)[:2]):
-        if dy + i * (df.size + 1) + df.size > h - 4:
+    for i, line in enumerate(wrap(d, dek, df, w - 14)[:3]):
+        if dy + i * (df.size + 1) + df.size > h - 3:
             break
-        d.text((6, dy + i * (df.size + 1)), line, font=df, fill=MUTED)
+        d.text((6, dy + i * (df.size + 1)), line, font=df, fill=(22, 14, 10))
     base.paste(layer, (x, y))
 
 
@@ -243,24 +255,23 @@ def render():
     if len(illustrated) != 13 or len(also) != 30:
         raise SystemExit(f"counts illustrated={len(illustrated)} also={len(also)}")
     sans = face("Arimo")
-    sansb = face("Arimo:weight=700")
-    serif = face("Libre Baskerville:weight=700")
-    paths = {"sans": sans, "sansb": sansb, "serif": serif}
+    serif = face("Playfair Display")
+    paths = {"sans": sans, "sansb": sans, "serif": serif}
     im = Image.new("RGB", (1024, 1024), PAPER)
     d = ImageDraw.Draw(im)
-    kicker = ImageFont.truetype(sansb, 13)
+    kicker = font(sans, 13, 700)
     d.text((10, 5), "THE WORLD'S NEWS IN ONE PICTURE", font=kicker, fill=RUST)
     right = f"{len(illustrated) + len(also)} STORIES · 6 CONTINENTS · ALL FROM WEDNESDAY"
-    d.text((1014 - d.textlength(right, font=kicker), 5), right, font=kicker, fill=INK)
+    d.text((1014 - d.textlength(right, font=kicker), 5), right, font=kicker, fill=HEAD)
     date = "Wednesday 18 November 2026"
-    date_font = fit(serif, date, 1000, 58, 40, d)
+    date_font = fit(serif, date, 1004, 52, 36, d, 900)
     dx = (1024 - d.textlength(date, font=date_font)) / 2
     dy = 20
-    d.text((dx, dy), date, font=date_font, fill=INK)
+    d.text((dx, dy), date, font=date_font, fill=HEAD)
     # Key sits under the date's real ink, not under font.size (descenders overlap that).
     rule_y = d.textbbox((dx, dy), date, font=date_font)[3] + 5
     d.line((20, rule_y, 1004, rule_y), fill=INK, width=2)
-    key_font = ImageFont.truetype(sans, 12)
+    key_font = font(sans, 12, 700)
     keys = [("Diplomacy", "DIPLOMACY"), ("War", "IRAN WAR"), ("Politics", "POLITICS"),
             ("Tech", "TECH"), ("Health", "HEALTH"), ("Climate", "CLIMATE"),
             ("Courts", "COURTS"), ("Energy", "ENERGY"), ("Sport", "SPORT")]
@@ -269,11 +280,11 @@ def render():
     ky = rule_y + 6
     for (label, fk), wlabel in zip(keys, widths):
         d.rectangle((kx, ky + 2, kx + 10, ky + 12), fill=FIELD[fk])
-        d.text((kx + 13, ky), label, font=key_font, fill=INK)
+        d.text((kx + 13, ky), label, font=key_font, fill=HEAD)
         kx += wlabel + 10
-    fonts = {"sans": sans, "sansb": sansb, "serif": serif,
-             "chip": ImageFont.truetype(sansb, 11),
-             "dek": ImageFont.truetype(sans, 13), "dek_s": ImageFont.truetype(sans, 11)}
+    fonts = {"sans": sans, "sansb": sans, "serif": serif,
+             "chip": font(sans, 11, 700),
+             "dek": font(sans, 13, 700), "dek_s": font(sans, 11, 700)}
     footer_h, bottom_h = 44, 300
     bottom_y = 1024 - 6 - footer_h - bottom_h
     lead_y = ky + key_font.size + 8
@@ -290,28 +301,42 @@ def render():
     for i, s in enumerate(illustrated[3:]):
         row, col = divmod(i, 5)
         card(im, d, (8 + col * (sw + gap), sy + row * (small_h + small_gap), sw, small_h), s, fonts, False)
-    d.rounded_rectangle((8, bottom_y, 456, bottom_y + bottom_h), radius=4, outline=(176, 164, 146), width=1)
-    hfont = ImageFont.truetype(sansb, 13)
-    d.text((16, bottom_y + 4), "WHERE IT HAPPENED", font=hfont, fill=INK)
-    map_box = (14, bottom_y + 20, 436, bottom_h - 68)
+    map_right = 408
+    d.rounded_rectangle((8, bottom_y, map_right, bottom_y + bottom_h), radius=4, outline=(176, 164, 146), width=1)
+    hfont = font(sans, 13, 700)
+    d.text((16, bottom_y + 3), "WHERE IT HAPPENED", font=hfont, fill=HEAD)
+    map_h = 172
+    map_box = (16, bottom_y + 19, map_right - 28, map_h)
     paint_land(im, map_box)
     pins(d, (map_box[0], map_box[1]), map_box[2], map_box[3], illustrated, also,
-         ImageFont.truetype(sansb, 11))
-    legend = list(REG.items())
-    lf = ImageFont.truetype(sans, 14)
-    for i, (name, col) in enumerate(legend):
-        lx = 16 + (i % 3) * 146
-        ly = bottom_y + bottom_h - 42 + (i // 3) * 19
-        d.ellipse((lx, ly + 3, lx + 11, ly + 14), fill=col)
-        d.text((lx + 14, ly), name, font=lf, fill=INK)
-    ax = 462
+         font(sans, 10, 700))
+    fy = map_box[1] + map_h + 3
+    d.text((16, fy), "THE DAY IN FIGURES", font=font(sans, 11, 700), fill=RUST)
+    figures = [("21", "ECONOMIES"), ("$116BN", "REVENUE"), ("56–44", "SENATE"), ("330", "MONTHS")]
+    nf = font(serif, 16, 900)
+    cf = font(sans, 9, 700)
+    slot = (map_right - 24) / 4
+    for i, (num, cap) in enumerate(figures):
+        cx = 16 + i * slot + slot / 2
+        tw = d.textlength(num, font=nf)
+        d.text((cx - tw / 2, fy + 13), num, font=nf, fill=HEAD)
+        tw = d.textlength(cap, font=cf)
+        d.text((cx - tw / 2, fy + 31), cap, font=cf, fill=HEAD)
+    lf = font(sans, 12, 700)
+    leg_y = fy + 46
+    for i, (name, col) in enumerate(REG.items()):
+        lx = 16 + (i % 3) * 128
+        ly = leg_y + (i // 3) * 16
+        d.ellipse((lx, ly + 2, lx + 10, ly + 12), fill=col)
+        d.text((lx + 13, ly), name, font=lf, fill=HEAD)
+    ax = 414
     d.rounded_rectangle((ax, bottom_y, 1016, bottom_y + bottom_h), radius=4, outline=(176, 164, 146), width=1)
-    d.text((ax + 8, bottom_y + 4), "ALSO ON WEDNESDAY 18 NOVEMBER", font=hfont, fill=INK)
-    af = ImageFont.truetype(sans, 12)
-    col_w = (1016 - ax - 20) / 2
+    d.text((ax + 8, bottom_y + 3), "ALSO ON WEDNESDAY 18 NOVEMBER", font=hfont, fill=HEAD)
+    af = font(sans, 12, 700)
+    col_w = (1016 - ax - 16) / 2
     longest = max(ALSO.values(), key=len)
-    while af.size > 9 and d.textlength("43  " + longest, font=af) > col_w:
-        af = ImageFont.truetype(sans, af.size - 1)
+    while af.size > 10 and d.textlength("43  " + longest, font=af) > col_w - 4:
+        af = font(sans, af.size - 1, 700)
     top = bottom_y + 22
     row_h = (bottom_h - 28) / 15
     for i, s in enumerate(also):
@@ -320,11 +345,11 @@ def render():
         yy = top + row * row_h
         num = str(s["num"])
         d.text((xx, yy), num, font=af, fill=rcol(s["region"]))
-        d.text((xx + d.textlength(num, font=af) + 4, yy), ALSO[s["n"]], font=af, fill=INK)
+        d.text((xx + d.textlength(num, font=af) + 3, yy), ALSO[s["n"]], font=af, fill=HEAD)
     src = ("Sources: AP, BNN Bloomberg, Dawn, GhanaWeb, Inquirer, NBC News, The Nation, "
            "New York Times, Nikkei Asia, PBS, Philstar, Religion Media Centre, Reuters, "
            "SBS, TechCrunch, allAfrica. Original drawings.")
-    sf = ImageFont.truetype(sans, 11)
+    sf = font(sans, 11, 600)
     fy = bottom_y + bottom_h + 3
     for i, line in enumerate(wrap(d, src, sf, 1004)[:2]):
         d.text((10, fy + i * 13), line, font=sf, fill=MUTED)
@@ -332,7 +357,7 @@ def render():
     d.rounded_rectangle((8, jy, 1016, min(1022, jy + 16)), radius=2, outline=RUST, width=1)
     note = ("JUDGE NOTE   Every story happened or was first reported on Wednesday 18 November 2026. "
             "Disputed claims are attributed.")
-    nf = fit(sansb, note, 996, 11, 9, d)
+    nf = fit(sans, note, 996, 11, 9, d, 700)
     d.text((14, jy + 2), note, font=nf, fill=INK)
     raw = ROOT / "build" / "raw.png"
     im.save(raw)

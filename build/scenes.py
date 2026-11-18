@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 INK = (28, 20, 14)
 RED = (176, 32, 36)
-GOLD = (228, 176, 32)
+GOLD = (240, 196, 0)
 WHITE = (255, 252, 246)
 NAVY = (18, 52, 118)
 GREEN = (16, 122, 70)
@@ -42,7 +42,7 @@ class R:
 
     def px(self, fonts, rel, bold=True):
         path = fonts["sansb"] if bold else fonts["sans"]
-        return ImageFont.truetype(path, max(8, int(self.h * rel)))
+        return _font(path, max(8, int(self.h * rel)), 700 if bold else 400)
 
 
 def _sky(r):
@@ -74,7 +74,7 @@ def _flag_kw(r, x, y, w, h):
 def _flag_kr(r, x, y, w, h):
     r.rect(x, y, w, h, WHITE, INK)
     r.oval(x + w * 0.28, y + h * 0.18, w * 0.44, h * 0.64, RED)
-    r.d.pieslice(r.box(x + w * 0.28, y + h * 0.18, w * 0.44, h * 0.64), 200, 20, fill=(20, 70, 170))
+    r.d.pieslice(r.box(x + w * 0.28, y + h * 0.18, w * 0.44, h * 0.64), 200, 20, fill=(26, 86, 196))
 
 
 def _flag_uk(r, x, y, w, h):
@@ -85,9 +85,28 @@ def _flag_uk(r, x, y, w, h):
     r.rect(x + w * 0.44, y, w * 0.12, h, RED)
 
 
+def _font(path, size, weight=700):
+    font = ImageFont.truetype(path, max(8, int(size)))
+    try:
+        font.set_variation_by_axes([int(weight)])
+    except OSError:
+        pass
+    return font
+
+
+def _centered(d, r, text, cx, cy, rel, fill, fonts):
+    size = max(8, int(r.h * rel))
+    font = _font(fonts["sansb"], size, 700)
+    tw = d.textlength(text, font=font)
+    d.text((cx / 100 * r.w - tw / 2, cy / 100 * r.h), text, font=font, fill=fill)
+
+
 def _person(r, x, y, s=1):
-    r.oval(x, y, 7 * s, 8 * s, INK)
-    r.rect(x - 1.5 * s, y + 8 * s, 10 * s, 14 * s, (40, 60, 110))
+    r.oval(x, y, 9 * s, 10 * s, (214, 176, 140))
+    r.rect(x + 0.5 * s, y, 8 * s, 3.8 * s, INK)
+    r.poly([(x - 3 * s, y + 22 * s), (x + 4.5 * s, y + 9.4 * s), (x + 12 * s, y + 22 * s)], (28, 40, 84))
+    r.poly([(x + 3.2 * s, y + 10 * s), (x + 5.8 * s, y + 10 * s),
+            (x + 5.2 * s, y + 17 * s), (x + 3.8 * s, y + 17 * s)], WHITE)
 
 
 def _drone(r, x, y):
@@ -102,192 +121,250 @@ def _houses(r, x, y):
         r.rect(x + 1 + i * 9, y + 8, 6, 8, SAND, INK)
 
 
+def _flags21(r, x, y):
+    cols = [(176, 32, 36), (26, 86, 196), (16, 122, 70), GOLD, NAVY,
+            (14, 118, 128), (196, 96, 24), (104, 58, 164), (22, 118, 70)]
+    n = 0
+    for row in range(3):
+        for col in range(7):
+            c = cols[n % len(cols)]
+            fx, fy = x + col * 5.2, y + row * 9
+            r.rect(fx, fy, 4.2, 6.4, c, INK)
+            r.rect(fx, fy, 1.3, 6.4, WHITE if c != WHITE else RED)
+            n += 1
+
+
 def scene1(d, w, h, fonts):
     r = R(d, w, h)
-    _sky(r)
-    _flag_cn(r, 4, 16, 16, 42)
-    _person(r, 30, 28)
-    r.rect(26, 50, 16, 18, (120, 72, 48))
-    r.rect(24, 66, 20, 4, (90, 54, 36))
-    r.rect(70, 28, 3, 40, (90, 70, 48))
-    r.rect(90, 28, 3, 40, (90, 70, 48))
-    r.rect(68, 20, 26, 5, GOLD)
-    for i in range(7):
-        a = math.radians(200 + i * 20)
-        x, y = 48 + 28 * math.cos(a), 18 + 16 * math.sin(a) * -1
-        r.poly([(x, y), (x + 3, y + 5), (x - 2, y + 4)], RED)
+    r.rect(0, 0, 100, 100, SKY)
+    r.rect(0, 74, 100, 26, (176, 158, 130))
+    _flag_cn(r, 2, 8, 14, 34)
+    _person(r, 30, 16, 1.15)
+    r.line([(48, 36), (48, 24)], (50, 52, 56), max(2, r.h * 0.035))
+    r.oval(46.2, 20, 3.6, 5.5, (50, 52, 56))
+    r.poly([(22, 76), (28, 44), (50, 44), (56, 76)], (122, 74, 46))
+    r.rect(26, 40, 26, 6, (92, 56, 34))
+    r.rect(23, 50, 34, 24, (148, 28, 32), INK)
+    _centered(d, r, "APEC 2026", 40, 52, 0.11, WHITE, fonts)
+    _centered(d, r, "SHENZHEN", 40, 64, 0.10, WHITE, fonts)
+    _flags21(r, 63, 26)
+
+
+def _kw_tower(r, x, top, tall):
+    r.rect(x + 2.4, top, 1.5, 70 - top, (236, 238, 240))
+    r.oval(x, top + 16, 6.2, 14, (64, 138, 176), INK)
+    if tall:
+        r.oval(x + 1.1, top + 6, 4, 9, (150, 196, 214), INK)
+        r.line([(x + 3.1, top + 6), (x + 3.1, top - 6)], (236, 238, 240), max(2, r.h * 0.03))
 
 
 def scene2(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, SKY)
-    r.rect(0, 58, 100, 42, SEA)
-    r.poly([(0, 62), (28, 48), (58, 60), (100, 46), (100, 70), (0, 78)], SAND)
-    _flag_kw(r, 4, 8, 20, 32)
-    _drone(r, 36, 14)
-    _drone(r, 56, 28)
-    r.line([(78, 70), (78, 48)], INK, r.h * 0.04)
-    r.poly([(70, 48), (86, 48), (78, 38)], (70, 78, 90))
-    r.oval(62, 28, 22, 16, None, RED)
+    r.rect(0, 0, 100, 58, SKY)
+    r.rect(0, 56, 100, 44, SEA)
+    r.poly([(0, 64), (22, 52), (48, 60), (78, 50), (100, 58), (100, 78), (0, 82)], SAND)
+    _flag_kw(r, 3, 6, 16, 26)
+    _kw_tower(r, 24, 18, True)
+    _kw_tower(r, 34, 26, False)
+    r.rect(46, 36, 7, 28, (168, 176, 182), INK)
+    r.rect(47.2, 40, 1.6, 3, (90, 150, 180))
+    r.rect(50.2, 40, 1.6, 3, (90, 150, 180))
+    r.rect(47.2, 46, 1.6, 3, (90, 150, 180))
+    r.rect(55, 42, 6, 22, (140, 148, 154), INK)
+    r.rect(70, 66, 12, 5, (60, 68, 62), INK)
+    r.poly([(80, 66), (92, 60), (92, 66)], (48, 52, 48))
+    r.line([(84, 63), (48, 16)], GOLD, max(2, r.h * 0.04))
+    r.line([(86, 64), (68, 24)], (255, 214, 64), max(2, r.h * 0.035))
+    _drone(r, 40, 8)
+    r.oval(38, 4, 18, 16, None, RED)
+    _drone(r, 60, 16)
+    r.line([(62, 18), (76, 30)], RED, max(2, r.h * 0.045))
+    r.line([(76, 18), (62, 30)], RED, max(2, r.h * 0.045))
 
 
 def scene3(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (232, 240, 232))
-    r.rect(8, 8, 40, 44, (24, 120, 64), INK)
+    r.rect(0, 0, 100, 100, (214, 220, 226))
+    r.rect(3, 4, 58, 50, (232, 236, 238), INK)
+    heights = (22, 30, 38, 46)
+    for i, bh in enumerate(heights):
+        r.rect(7 + i * 9, 50 - bh, 7, bh, (20, 118, 64) if i < 3 else (12, 86, 48), INK)
+    _centered(d, r, "$116BN", 24, 6, 0.18, INK, fonts)
+    r.rect(66, 10, 24, 26, (20, 122, 68), INK)
+    for i in range(4):
+        r.rect(69, 14 + i * 5, 18, 2.2, (186, 224, 186))
     for i in range(5):
-        r.rect(12, 14 + i * 7, 32, 4, (180, 220, 180))
-    r.oval(58, 20, 32, 42, None, RED)
-    r.line([(64, 28), (84, 52)], RED, max(2, int(r.h * 0.06)))
-    r.line([(84, 28), (64, 52)], RED, max(2, int(r.h * 0.06)))
-    label = "$116BN"
-    size = max(12, int(h * 0.22))
-    f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 11 and d.textlength(label, font=f) > w * 0.72:
-        size -= 1
-        f = ImageFont.truetype(fonts["sansb"], size)
-    tw = d.textlength(label, font=f)
-    d.text(((w - tw) / 2, h - size - h * 0.08), label, font=f, fill=INK)
+        r.rect(63.5, 12 + i * 5, 2.8, 1.8, GOLD)
+        r.rect(89.5, 12 + i * 5, 2.8, 1.8, GOLD)
+    r.poly([(4, 86), (96, 86), (88, 60), (12, 60)], (124, 78, 48))
+    r.line([(12, 60), (88, 60)], (90, 56, 32), max(2, r.h * 0.04))
+    r.rect(40, 64, 22, 14, WHITE, INK)
+    _centered(d, r, "CEO", 51, 66, 0.16, INK, fonts)
+    r.line([(42, 66), (60, 76)], RED, max(2, r.h * 0.045))
+    r.line([(60, 66), (42, 76)], RED, max(2, r.h * 0.045))
 
 
 def scene4(d, w, h, fonts):
     r = R(d, w, h)
     r.rect(0, 0, 100, 100, SKY)
-    _flag_cn(r, 3, 10, 18, 36)
-    _flag_kr(r, 24, 10, 18, 36)
-    r.poly([(58, 18), (70, 16), (74, 40), (78, 78), (64, 80), (60, 48)], (150, 170, 140))
-    for i, col in enumerate(((40, 90, 160), (40, 140, 80), (200, 140, 40))):
-        r.rect(8 + i * 16, 62, 12, 16, col, INK)
+    r.rect(0, 70, 100, 30, (186, 170, 146))
+    _flag_cn(r, 2, 6, 16, 28)
+    _flag_kr(r, 20, 6, 16, 28)
+    r.poly([(62, 14), (74, 12), (78, 36), (82, 72), (68, 74), (64, 40)], (120, 158, 120), INK)
+    _person(r, 4, 30, 1.05)
+    _person(r, 32, 30, 1.05)
+    r.poly([(6, 84), (54, 84), (48, 66), (12, 66)], (110, 70, 44))
+    for i, col in enumerate(((32, 96, 170), (28, 140, 78), (190, 140, 36))):
+        r.rect(16 + i * 11, 68, 8, 9, col, INK)
         if i:
-            r.line([(8 + i * 16 - 4, 70), (8 + i * 16, 70)], INK, 2)
+            r.line([(16 + i * 11 - 3, 72), (16 + i * 11, 72)], INK, 2)
 
 
 def scene5(d, w, h, fonts):
     r = R(d, w, h)
     r.rect(0, 0, 100, 100, SKY)
-    r.poly([(6, 42), (28, 16), (50, 42)], WHITE)
-    r.rect(10, 42, 36, 36, WHITE, INK)
+    r.rect(0, 78, 100, 22, (168, 186, 150))
+    r.rect(4, 46, 18, 32, WHITE, INK)
+    r.rect(40, 46, 18, 32, WHITE, INK)
+    r.poly([(16, 46), (31, 22), (46, 46)], WHITE, INK)
+    r.rect(22, 40, 18, 38, WHITE, INK)
     for i in range(4):
-        r.rect(14 + i * 8, 48, 3, 24, (200, 206, 214))
-    r.rect(50, 30, 46, 32, (244, 236, 214), INK)
-    label = "OVERTON"
-    size = max(8, int(h * 0.15))
-    f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 8 and (d.textlength(label, font=f) > w * 0.34 or size > h * 0.18):
-        size -= 1
-        f = ImageFont.truetype(fonts["sansb"], size)
-    tw = d.textlength(label, font=f)
-    d.text((w * 0.50 + (w * 0.46 - tw) / 2, h * 0.36), label, font=f, fill=INK)
-    r.poly([(78, 58), (96, 58), (96, 78), (74, 78)], (90, 70, 56))
-    r.line([(74, 48), (80, 60)], RED, r.h * 0.05)
+        r.rect(24 + i * 4, 48, 2.2, 22, (186, 196, 206))
+    r.rect(48, 18, 4, 10, (40, 70, 140))
+    r.rect(46, 16, 8, 3, RED)
+    r.rect(54, 28, 40, 22, (250, 244, 226), INK)
+    _centered(d, r, "OVERTON", 74, 32, 0.16, INK, fonts)
+    r.poly([(62, 64), (94, 64), (98, 84), (58, 84)], (96, 74, 52), INK)
+    r.line([(78, 68), (90, 80)], RED, max(2, r.h * 0.045))
+    r.line([(90, 68), (78, 80)], RED, max(2, r.h * 0.045))
 
 
 def scene6(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (226, 236, 242))
-    r.poly([(4, 28), (22, 16), (40, 26), (34, 48), (46, 64), (28, 80), (6, 70), (2, 46)], (70, 120, 150))
-    label = "56–44"
-    size = max(11, int(h * 0.32))
-    f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 10 and d.textlength(label, font=f) > w * 0.46:
-        size -= 1
-        f = ImageFont.truetype(fonts["sansb"], size)
-    d.text((w * 0.52, h * 0.36), label, font=f, fill=INK)
+    r.rect(0, 0, 100, 100, (214, 228, 234))
+    r.poly([(2, 58), (14, 40), (28, 34), (40, 40), (48, 30), (54, 46),
+            (46, 58), (52, 78), (40, 68), (26, 74), (12, 62), (4, 70)], (64, 124, 156), INK)
+    r.oval(6, 66, 4, 3, (64, 124, 156), INK)
+    r.oval(12, 70, 3.4, 2.6, (64, 124, 156), INK)
+    r.rect(60, 40, 22, 32, (24, 52, 104), INK)
+    r.rect(58, 34, 26, 8, (16, 36, 78))
+    r.rect(66, 36, 10, 2.4, (8, 14, 28))
+    r.rect(66, 16, 10, 20, WHITE, INK)
+    r.line([(68, 22), (74, 22)], INK, max(1, int(r.h * 0.025)))
+    r.line([(68, 26), (74, 26)], INK, max(1, int(r.h * 0.025)))
+    _centered(d, r, "56-44", 78, 78, 0.22, INK, fonts)
 
 
 def scene7(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (236, 228, 220))
-    r.rect(4, 28, 6, 28, (180, 190, 200), INK)
-    r.poly([(2, 28), (12, 28), (7, 18)], (200, 60, 60))
-    blobs = [(22, (70, 110, 160), "US"), (48, (40, 130, 80), "MEX"), (74, (190, 150, 40), "BOL")]
-    f = r.px(fonts, 0.2)
-    for x, col, name in blobs:
-        r.oval(x, 22, 20, 28, col, INK)
-        r.oval(x + 6, 30, 5, 5, RED)
-        r.text(x + 2, 56, name, f, INK)
+    r.rect(0, 0, 100, 100, (236, 228, 218))
+    r.rect(5, 28, 7, 32, (214, 220, 224), INK)
+    r.rect(6.4, 16, 4.2, 14, (70, 76, 82))
+    r.poly([(7.2, 60), (9.8, 60), (8.5, 78)], (150, 160, 168), INK)
+    r.rect(6.6, 22, 3.8, 3, RED)
+    # US with a Florida point, Mexico with Baja, Bolivia
+    r.poly([(24, 22), (40, 20), (42, 34), (38, 36), (40, 48), (30, 46), (22, 36)], (70, 116, 164), INK)
+    r.poly([(46, 28), (52, 24), (58, 30), (62, 48), (50, 52), (44, 40)], (36, 130, 78), INK)
+    r.poly([(44, 34), (46, 30), (48, 40)], (36, 130, 78))
+    r.poly([(74, 24), (86, 28), (84, 52), (72, 48)], (190, 148, 40), INK)
+    for x, y in ((32, 30), (54, 36), (78, 36)):
+        r.oval(x, y, 5, 5, RED)
+    f = r.px(fonts, 0.16)
+    r.text(28, 58, "US", f, INK)
+    r.text(48, 58, "MEX", f, INK)
+    r.text(74, 58, "BOL", f, INK)
 
 
 def scene8(d, w, h, fonts):
     r = R(d, w, h)
     r.rect(0, 0, 100, 100, SKY)
-    r.oval(4, 8, 22, 36, GOLD)
-    r.poly([(28, 30), (40, 22), (58, 26), (62, 48), (48, 62), (32, 58), (26, 44)], (40, 140, 90))
-    r.rect(62, 32, 34, 50, WHITE, INK)
-    label = "2030"
-    size = max(8, int(h * 0.24))
-    f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 8 and d.textlength(label, font=f) > w * 0.28:
-        size -= 1
-        f = ImageFont.truetype(fonts["sansb"], size)
-    tw = d.textlength(label, font=f)
-    d.text((w * 0.62 + (w * 0.34 - tw) / 2, h * 0.44), label, font=f, fill=RED)
+    r.oval(2, 6, 16, 26, GOLD)
+    # Cape York, gulf bite, southern coast, Tasmania
+    r.poly([(28, 18), (36, 14), (40, 28), (52, 26), (62, 36), (66, 52),
+            (54, 64), (40, 60), (30, 66), (22, 52), (24, 36)], (36, 140, 88), INK)
+    r.oval(48, 64, 8, 6, (36, 140, 88), INK)
+    r.rect(70, 22, 26, 52, WHITE, INK)
+    r.rect(73, 28, 20, 2, (180, 176, 160))
+    r.rect(73, 34, 16, 2, (180, 176, 160))
+    _centered(d, r, "2030", 83, 44, 0.24, RED, fonts)
+    _centered(d, r, "NET ZERO", 83, 64, 0.12, INK, fonts)
 
 
 def scene9(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (220, 226, 230))
-    for i, lamp in enumerate((GREEN, GOLD, GREEN)):
-        r.rect(8 + i * 20, 16, 16, 58, (36, 44, 56), INK)
-        r.oval(12 + i * 20, 24, 8, 12, lamp)
-    r.line([(74, 30), (90, 48), (78, 48), (94, 68)], GREEN, r.h * 0.07)
+    r.rect(0, 0, 100, 100, (214, 220, 224))
+    lamps = (GREEN, GOLD, GREEN)
+    for i, lamp in enumerate(lamps):
+        x = 6 + i * 22
+        r.rect(x, 14, 16, 62, (32, 40, 50), INK)
+        for row in range(5):
+            for col in range(3):
+                r.rect(x + 2 + col * 4, 28 + row * 8, 2.6, 4, (70, 150, 90) if lamp == GREEN else (90, 96, 70))
+        r.oval(x + 4, 16, 8, 8, lamp, INK)
+    r.line([(74, 28), (88, 44), (76, 44), (92, 64)], GREEN, max(3, r.h * 0.07))
 
 
 def scene10(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (236, 230, 214))
-    _flag_uk(r, 4, 12, 22, 36)
-    r.poly([(32, 18), (52, 8), (56, 16), (36, 26)], (110, 72, 40))
-    r.rect(48, 24, 16, 4, (110, 72, 40))
-    _houses(r, 4, 58)
-    label = "1,200"
-    size = max(10, int(h * 0.26))
-    f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 10 and d.textlength(label, font=f) > w * 0.40:
-        size -= 1
-        f = ImageFont.truetype(fonts["sansb"], size)
-    d.text((w * 0.58, h * 0.50), label, font=f, fill=RED)
+    r.rect(0, 0, 100, 100, (236, 228, 210))
+    _flag_uk(r, 3, 8, 20, 32)
+    r.poly([(30, 28), (52, 10), (58, 20), (36, 38)], (122, 78, 42), INK)
+    r.rect(46, 30, 18, 5, (92, 58, 32))
+    _houses(r, 3, 52)
+    _centered(d, r, "1,200+", 76, 48, 0.26, RED, fonts)
 
 
 def scene11(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (228, 224, 216))
-    r.rect(4, 28, 46, 28, (92, 64, 42), INK)
-    r.rect(8, 18, 6, 14, (70, 48, 32))
-    r.rect(40, 18, 6, 14, (70, 48, 32))
-    r.rect(54, 26, 42, 58, WHITE, INK)
-    label = "330"
-    size = max(10, int(h * 0.32))
-    f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 10 and (d.textlength(label, font=f) > w * 0.34 or size > h * 0.38):
-        size -= 1
-        f = ImageFont.truetype(fonts["sansb"], size)
-    tw = d.textlength(label, font=f)
-    d.text((w * 0.54 + (w * 0.42 - tw) / 2, h * 0.38), label, font=f, fill=INK)
+    r.rect(0, 0, 100, 100, (226, 220, 208))
+    r.rect(2, 36, 48, 16, (118, 74, 44), INK)
+    r.rect(0, 50, 52, 8, (82, 52, 30))
+    r.poly([(6, 30), (34, 12), (40, 20), (12, 38)], (102, 68, 40), INK)
+    r.line([(16, 32), (8, 70)], (72, 46, 28), max(3, r.h * 0.07))
+    r.rect(56, 22, 40, 58, WHITE, INK)
+    _centered(d, r, "330", 76, 28, 0.32, INK, fonts)
+    _centered(d, r, "MONTHS", 76, 60, 0.15, RED, fonts)
 
 
 def scene12(d, w, h, fonts):
     r = R(d, w, h)
     r.rect(0, 0, 100, 100, SKY)
-    r.poly([(2, 30), (24, 22), (28, 70), (4, 74)], SAND)
-    r.poly([(70, 26), (96, 20), (98, 72), (68, 68)], (170, 196, 140))
-    r.line([(26, 48), (72, 44)], (40, 90, 160), r.h * 0.06)
-    r.poly([(68, 38), (80, 44), (68, 50)], RED)
-    r.oval(44, 40, 12, 18, (200, 80, 40), INK)
+    r.poly([(2, 28), (26, 18), (32, 72), (4, 78)], SAND, INK)
+    r.poly([(68, 22), (98, 16), (99, 74), (66, 70)], (150, 186, 120), INK)
+    r.line([(28, 48), (70, 42)], (36, 96, 168), max(4, r.h * 0.07))
+    r.oval(40, 36, 14, 20, (196, 96, 36), INK)
+    r.line([(44, 40), (50, 52)], (90, 50, 24), max(2, r.h * 0.04))
+    r.poly([(64, 34), (76, 42), (64, 50)], RED)
+    r.rect(78, 28, 12, 16, WHITE, INK)
+    r.rect(78, 50, 12, 16, WHITE, INK)
+    r.line([(80, 36), (88, 36)], INK, 1)
+    r.line([(80, 58), (88, 58)], INK, 1)
 
 
 def scene13(d, w, h, fonts):
     r = R(d, w, h)
-    r.rect(0, 0, 100, 100, (226, 232, 220))
-    r.line([(8, 70), (50, 16), (92, 70)], INK, max(2, r.h * 0.045))
-    r.line([(8, 70), (92, 70)], INK, r.h * 0.05)
-    r.rect(6, 8, 16, 12, RED)
-    r.rect(6, 12, 16, 4, GOLD)
-    r.rect(6, 16, 16, 4, GREEN)
-    for i, x in enumerate((30, 42, 62, 74)):
-        r.oval(x, 40, 8, 10, INK)
-        r.line([(x + 4, 50), (x + 4, 68)], INK, 2)
-    r.line([(38, 56), (64, 52)], RED, r.h * 0.05)
+    r.rect(0, 0, 100, 100, (206, 216, 200))
+    r.rect(4, 8, 14, 16, RED, INK)
+    r.rect(4, 13, 14, 5.2, GOLD)
+    r.rect(4, 18.2, 14, 5.8, GREEN)
+    r.rect(6, 18, 2, 28, (70, 74, 78))
+    r.rect(2, 14, 10, 4, (250, 236, 170))
+    r.rect(88, 18, 2, 28, (70, 74, 78))
+    r.rect(84, 14, 10, 4, (250, 236, 170))
+    r.poly([(8, 58), (50, 34), (92, 58), (92, 70), (8, 70)], (120, 130, 124), INK)
+    for i, x in enumerate((16, 28, 40, 58, 70, 82)):
+        r.oval(x, 42, 6, 6, RED if i % 2 == 0 else GOLD)
+    r.oval(22, 62, 52, 28, (34, 130, 64), WHITE)
+    r.line([(48, 64), (48, 88)], WHITE, max(2, r.h * 0.03))
+    # fans in a scuffle, police with a shield between them
+    r.oval(24, 66, 7, 7, (40, 36, 32))
+    r.rect(25, 73, 5, 10, RED)
+    r.oval(40, 62, 7, 7, (230, 236, 240))
+    r.rect(41, 69, 5, 12, (24, 58, 140))
+    r.rect(46, 70, 5, 8, (180, 190, 200), INK)
+    r.oval(56, 66, 7, 7, (40, 36, 32))
+    r.rect(57, 73, 5, 10, GOLD)
+    r.line([(30, 76), (40, 74)], RED, max(2, r.h * 0.04))
 
 
 SCENES = {

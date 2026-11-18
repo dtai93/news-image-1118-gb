@@ -124,3 +124,15 @@ Visible defects only. Story text, story set, and the rest of the layout are unch
 Checked at 1024 and at 300px: date and key are separate, `$116BN` and `330` sit fully in their pictures, Islamabad has no overlapping label, legend names read. `entry.png` is 1024×1024 palette, 82,947 bytes. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches it.
 
 Next: change the picture only if a grade names a specific miss.
+
+## Session 7 — craft upgrade
+
+Facts, story set, and the newspaper grid are unchanged. Type and pictures are heavier.
+
+- Headlines and the date use Playfair Display at weight 900, ink `#0c0806`. Variable fonts were loading at weight 400, so “bold” paths had been regular. Arimo is now set to 700 for tags, deks, the field key, and the also-list. Deks stay 13px on leads and 11px on small cards. The also-list is 11px bold and near-black, so it still reads at 300px. Small cards allow a third dek line, so the longer deks (UK sanctions, TAPI, measles, net zero, outages) are no longer cut off.
+- Scenes are concrete: Xi at a podium under an “APEC 2026 / SHENZHEN” banner and 21 flags; Kuwait towers with two drones, interceptor trails, and a launcher; a boardroom table, a crossed-out CEO plate, a chip, and `$116BN` on the chart; Alaska, a ballot, and 56-44; a gavel with “330 MONTHS”; a stadium, fans, and police for Ghana. OVERTON stays readable; the red mark is on the out-tray.
+- “THE DAY IN FIGURES” under the map: 21 economies, $116BN revenue, 56–44 senate, 330 months. The continent legend sits beneath that strip and does not cover it.
+
+`entry.png` is 1024×1024 palette, 86,832 bytes. Checked at full size and at 300px: date, lead headlines, also-list, and the four figures read; banner text is clear of the caption bars. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches `entry.png`.
+
+Next: change the picture only if a grade names a specific miss.
