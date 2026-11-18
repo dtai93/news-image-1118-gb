@@ -182,7 +182,9 @@ def card(base, _d, box, story, fonts, lead):
     text_h = 98 if lead else 76
     art_h = max(44, h - text_h)
     art = (3, 3, w - 6, art_h)
-    paint_scene(layer, art, story["n"], fonts)
+    # Scene stops above the caption strip so picture text cannot be clipped by it.
+    bar = 15 if art_h > 90 else 13
+    paint_scene(layer, (art[0], art[1], art[2], max(24, art_h - bar)), story["n"], fonts)
     cfont = fit(fonts["sansb"], cap, art[2], 13 if lead else 10, 8, d)
     caption(d, art, cap, cfont)
     chip(d, w - 3, 3, chip_l, fonts["chip"])
@@ -251,17 +253,22 @@ def render():
     right = f"{len(illustrated) + len(also)} STORIES · 6 CONTINENTS · ALL FROM WEDNESDAY"
     d.text((1014 - d.textlength(right, font=kicker), 5), right, font=kicker, fill=INK)
     date = "Wednesday 18 November 2026"
-    date_font = fit(serif, date, 1000, 62, 40, d)
-    d.text(((1024 - d.textlength(date, font=date_font)) / 2, 20), date, font=date_font, fill=INK)
+    date_font = fit(serif, date, 1000, 58, 40, d)
+    dx = (1024 - d.textlength(date, font=date_font)) / 2
+    dy = 20
+    d.text((dx, dy), date, font=date_font, fill=INK)
+    # Key sits under the date's real ink, not under font.size (descenders overlap that).
+    rule_y = d.textbbox((dx, dy), date, font=date_font)[3] + 5
+    d.line((20, rule_y, 1004, rule_y), fill=INK, width=2)
     key_font = ImageFont.truetype(sans, 12)
     keys = [("Diplomacy", "DIPLOMACY"), ("War", "IRAN WAR"), ("Politics", "POLITICS"),
             ("Tech", "TECH"), ("Health", "HEALTH"), ("Climate", "CLIMATE"),
             ("Courts", "COURTS"), ("Energy", "ENERGY"), ("Sport", "SPORT")]
     widths = [16 + d.textlength(label, font=key_font) for label, _ in keys]
     kx = (1024 - (sum(widths) + 10 * (len(keys) - 1))) / 2
-    ky = 22 + date_font.size + 2
+    ky = rule_y + 6
     for (label, fk), wlabel in zip(keys, widths):
-        d.rectangle((kx, ky + 3, kx + 10, ky + 13), fill=FIELD[fk])
+        d.rectangle((kx, ky + 2, kx + 10, ky + 12), fill=FIELD[fk])
         d.text((kx + 13, ky), label, font=key_font, fill=INK)
         kx += wlabel + 10
     fonts = {"sans": sans, "sansb": sansb, "serif": serif,
@@ -269,7 +276,7 @@ def render():
              "dek": ImageFont.truetype(sans, 13), "dek_s": ImageFont.truetype(sans, 11)}
     footer_h, bottom_h = 44, 300
     bottom_y = 1024 - 6 - footer_h - bottom_h
-    lead_y = ky + 16
+    lead_y = ky + key_font.size + 8
     avail = bottom_y - 8 - lead_y
     lead_h = 208
     small_gap = 5
@@ -286,17 +293,17 @@ def render():
     d.rounded_rectangle((8, bottom_y, 456, bottom_y + bottom_h), radius=4, outline=(176, 164, 146), width=1)
     hfont = ImageFont.truetype(sansb, 13)
     d.text((16, bottom_y + 4), "WHERE IT HAPPENED", font=hfont, fill=INK)
-    map_box = (14, bottom_y + 20, 436, bottom_h - 58)
+    map_box = (14, bottom_y + 20, 436, bottom_h - 68)
     paint_land(im, map_box)
     pins(d, (map_box[0], map_box[1]), map_box[2], map_box[3], illustrated, also,
          ImageFont.truetype(sansb, 11))
     legend = list(REG.items())
-    lf = ImageFont.truetype(sans, 11)
+    lf = ImageFont.truetype(sans, 14)
     for i, (name, col) in enumerate(legend):
         lx = 16 + (i % 3) * 146
-        ly = bottom_y + bottom_h - 34 + (i // 3) * 15
-        d.ellipse((lx, ly + 2, lx + 9, ly + 11), fill=col)
-        d.text((lx + 12, ly), name, font=lf, fill=INK)
+        ly = bottom_y + bottom_h - 42 + (i // 3) * 19
+        d.ellipse((lx, ly + 3, lx + 11, ly + 14), fill=col)
+        d.text((lx + 14, ly), name, font=lf, fill=INK)
     ax = 462
     d.rounded_rectangle((ax, bottom_y, 1016, bottom_y + bottom_h), radius=4, outline=(176, 164, 146), width=1)
     d.text((ax + 8, bottom_y + 4), "ALSO ON WEDNESDAY 18 NOVEMBER", font=hfont, fill=INK)

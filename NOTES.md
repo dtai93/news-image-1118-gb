@@ -110,3 +110,17 @@ Story set: every fact from `data/stories.json`, Ghana promoted to the 13th illus
 `entry.png` is 1024×1024 palette PNG, 84,821 bytes. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches it. A 300px shrink still shows the date, the three lead headlines and the small-card headlines.
 
 Next: only change the picture if a grade names a specific miss. Watch the US-cluster pin offsets and the small-card deks if a judge says a number is clipped.
+
+## Session 6 — defect fix
+
+Visible defects only. Story text, story set, and the rest of the layout are unchanged.
+
+- Field key (Diplomacy, War, …) sat on the date’s descenders. A rule is now drawn from the date’s real ink box, and the key sits under that rule.
+- Nvidia lead: `$116BN` is drawn in the picture above the caption strip, not through it. Scenes are painted only above the caption, so the strip cannot cover picture text.
+- Islamabad: the big `2 PACTS` is gone. The red chip and the caption already say it; the drawing is the pipeline only.
+- Other picture labels checked and kept inside their shapes: OVERTON, 56–44, US/MEX/BOL, 2030, 1,200, 330.
+- Map legend labels are 14px (were 11). The map is a few pixels shorter so the legend does not cover land.
+
+Checked at 1024 and at 300px: date and key are separate, `$116BN` and `330` sit fully in their pictures, Islamabad has no overlapping label, legend names read. `entry.png` is 1024×1024 palette, 82,947 bytes. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches it.
+
+Next: change the picture only if a grade names a specific miss.

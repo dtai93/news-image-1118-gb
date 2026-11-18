@@ -134,13 +134,20 @@ def scene2(d, w, h, fonts):
 def scene3(d, w, h, fonts):
     r = R(d, w, h)
     r.rect(0, 0, 100, 100, (232, 240, 232))
-    r.rect(6, 22, 46, 56, (24, 120, 64), INK)
+    r.rect(8, 8, 40, 44, (24, 120, 64), INK)
     for i in range(5):
-        r.rect(10, 28 + i * 9, 38, 4, (180, 220, 180))
-    r.oval(58, 18, 34, 50, None)
-    r.line([(64, 28), (86, 56)], RED, r.h * 0.07)
-    r.line([(86, 28), (64, 56)], RED, r.h * 0.07)
-    r.text(60, 68, "$116BN", r.px(fonts, 0.28), INK)
+        r.rect(12, 14 + i * 7, 32, 4, (180, 220, 180))
+    r.oval(58, 20, 32, 42, None, RED)
+    r.line([(64, 28), (84, 52)], RED, max(2, int(r.h * 0.06)))
+    r.line([(84, 28), (64, 52)], RED, max(2, int(r.h * 0.06)))
+    label = "$116BN"
+    size = max(12, int(h * 0.22))
+    f = ImageFont.truetype(fonts["sansb"], size)
+    while size > 11 and d.textlength(label, font=f) > w * 0.72:
+        size -= 1
+        f = ImageFont.truetype(fonts["sansb"], size)
+    tw = d.textlength(label, font=f)
+    d.text(((w - tw) / 2, h - size - h * 0.08), label, font=f, fill=INK)
 
 
 def scene4(d, w, h, fonts):
@@ -162,8 +169,15 @@ def scene5(d, w, h, fonts):
     r.rect(10, 42, 36, 36, WHITE, INK)
     for i in range(4):
         r.rect(14 + i * 8, 48, 3, 24, (200, 206, 214))
-    r.rect(58, 36, 34, 14, (244, 236, 214), INK)
-    r.text(60, 38, "OVERTON", r.px(fonts, 0.16), INK)
+    r.rect(50, 30, 46, 32, (244, 236, 214), INK)
+    label = "OVERTON"
+    size = max(8, int(h * 0.15))
+    f = ImageFont.truetype(fonts["sansb"], size)
+    while size > 8 and (d.textlength(label, font=f) > w * 0.34 or size > h * 0.18):
+        size -= 1
+        f = ImageFont.truetype(fonts["sansb"], size)
+    tw = d.textlength(label, font=f)
+    d.text((w * 0.50 + (w * 0.46 - tw) / 2, h * 0.36), label, font=f, fill=INK)
     r.poly([(78, 58), (96, 58), (96, 78), (74, 78)], (90, 70, 56))
     r.line([(74, 48), (80, 60)], RED, r.h * 0.05)
 
@@ -173,13 +187,12 @@ def scene6(d, w, h, fonts):
     r.rect(0, 0, 100, 100, (226, 236, 242))
     r.poly([(4, 28), (22, 16), (40, 26), (34, 48), (46, 64), (28, 80), (6, 70), (2, 46)], (70, 120, 150))
     label = "56–44"
-    size = max(11, int(h * 0.36))
+    size = max(11, int(h * 0.32))
     f = ImageFont.truetype(fonts["sansb"], size)
-    while size > 10 and d.textlength(label, font=f) > w * 0.48:
+    while size > 10 and d.textlength(label, font=f) > w * 0.46:
         size -= 1
         f = ImageFont.truetype(fonts["sansb"], size)
-    tw = d.textlength(label, font=f)
-    d.text((w * 0.50, h * 0.32), label, font=f, fill=INK)
+    d.text((w * 0.52, h * 0.36), label, font=f, fill=INK)
 
 
 def scene7(d, w, h, fonts):
@@ -200,8 +213,15 @@ def scene8(d, w, h, fonts):
     r.rect(0, 0, 100, 100, SKY)
     r.oval(4, 8, 22, 36, GOLD)
     r.poly([(28, 30), (40, 22), (58, 26), (62, 48), (48, 62), (32, 58), (26, 44)], (40, 140, 90))
-    r.rect(66, 18, 28, 48, WHITE, INK)
-    r.text(68, 28, "2030", r.px(fonts, 0.28), RED)
+    r.rect(62, 32, 34, 50, WHITE, INK)
+    label = "2030"
+    size = max(8, int(h * 0.24))
+    f = ImageFont.truetype(fonts["sansb"], size)
+    while size > 8 and d.textlength(label, font=f) > w * 0.28:
+        size -= 1
+        f = ImageFont.truetype(fonts["sansb"], size)
+    tw = d.textlength(label, font=f)
+    d.text((w * 0.62 + (w * 0.34 - tw) / 2, h * 0.44), label, font=f, fill=RED)
 
 
 def scene9(d, w, h, fonts):
@@ -220,7 +240,13 @@ def scene10(d, w, h, fonts):
     r.poly([(32, 18), (52, 8), (56, 16), (36, 26)], (110, 72, 40))
     r.rect(48, 24, 16, 4, (110, 72, 40))
     _houses(r, 4, 58)
-    r.text(62, 48, "1,200", r.px(fonts, 0.3), RED)
+    label = "1,200"
+    size = max(10, int(h * 0.26))
+    f = ImageFont.truetype(fonts["sansb"], size)
+    while size > 10 and d.textlength(label, font=f) > w * 0.40:
+        size -= 1
+        f = ImageFont.truetype(fonts["sansb"], size)
+    d.text((w * 0.58, h * 0.50), label, font=f, fill=RED)
 
 
 def scene11(d, w, h, fonts):
@@ -229,8 +255,15 @@ def scene11(d, w, h, fonts):
     r.rect(4, 28, 46, 28, (92, 64, 42), INK)
     r.rect(8, 18, 6, 14, (70, 48, 32))
     r.rect(40, 18, 6, 14, (70, 48, 32))
-    r.rect(58, 16, 36, 50, WHITE, INK)
-    r.text(60, 28, "330", r.px(fonts, 0.38), INK)
+    r.rect(54, 26, 42, 58, WHITE, INK)
+    label = "330"
+    size = max(10, int(h * 0.32))
+    f = ImageFont.truetype(fonts["sansb"], size)
+    while size > 10 and (d.textlength(label, font=f) > w * 0.34 or size > h * 0.38):
+        size -= 1
+        f = ImageFont.truetype(fonts["sansb"], size)
+    tw = d.textlength(label, font=f)
+    d.text((w * 0.54 + (w * 0.42 - tw) / 2, h * 0.38), label, font=f, fill=INK)
 
 
 def scene12(d, w, h, fonts):
@@ -240,8 +273,7 @@ def scene12(d, w, h, fonts):
     r.poly([(70, 26), (96, 20), (98, 72), (68, 68)], (170, 196, 140))
     r.line([(26, 48), (72, 44)], (40, 90, 160), r.h * 0.06)
     r.poly([(68, 38), (80, 44), (68, 50)], RED)
-    r.oval(44, 38, 10, 16, (200, 80, 40), INK)
-    r.text(36, 62, "2 PACTS", r.px(fonts, 0.22), INK)
+    r.oval(44, 40, 12, 18, (200, 80, 40), INK)
 
 
 def scene13(d, w, h, fonts):
