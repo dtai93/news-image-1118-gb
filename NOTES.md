@@ -98,3 +98,15 @@ Drawings: US shape now has the Florida and Texas points, Mexico keeps a separate
 `entry.png` is a palette PNG, 1024×1024, 107,572 bytes. `mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts` matches `entry.png` on two runs. `out/` is gitignored. README is the make.fun template.
 
 Pushed to origin main. A later session should change the picture only if a grade names a specific miss.
+
+## Session 5 — match the #1 layout
+
+Rebuilt the picture in `build/page.py` (Pillow), `build/geo.py` (lon/lat continents, equirectangular 75N–56S filling the map box) and `build/scenes.py`. `build/build.sh` now runs `python3 build/page.py`. `main.ts` still copies `entry.png`.
+
+Layout now follows the 12–0 entry: kicker “THE WORLD'S NEWS IN ONE PICTURE” and “43 STORIES · 6 CONTINENTS · ALL FROM WEDNESDAY”; full-width date; three lead cards with ~110px scenes, dark caption strips and red stat chips; ten smaller illustrated cards in two rows of five; region-coloured tags, pins and legend; field-colour key kept under the date; “WHERE IT HAPPENED” map with numbered pins 1–13 and dots for the rest; two-column also list; source line and judge note.
+
+Story set: every fact from `data/stories.json`, Ghana promoted to the 13th illustrated card, plus three Wednesday wires — Flores magnitude 5.9 at 10 km (GFZ/Reuters), Tinubu hailing the rescue of 308 kidnap victims (The Nation), a Guinea court jailing 224 over illegal gold mining (allAfrica). No Tuesday events.
+
+`entry.png` is 1024×1024 palette PNG, 84,821 bytes. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches it. A 300px shrink still shows the date, the three lead headlines and the small-card headlines.
+
+Next: only change the picture if a grade names a specific miss. Watch the US-cluster pin offsets and the small-card deks if a judge says a number is clipped.
