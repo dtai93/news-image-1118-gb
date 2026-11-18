@@ -42,3 +42,13 @@ Unverified, not in the JSON: Voyager 1 "one light-day" (preview only), India-Jap
 - Crush the palette PNG. Confirm the gate (PNG signature, 1024×1024, ≤ 1 MiB).
 - Short README: how to run `MAKEFUN_OUTPUT_DIR=out node main.ts`.
 - Commit and push only if that session says to push.
+
+## Session 2 done
+
+`build/render.mjs` reads `data/stories.json` and writes `build/page.html`. `build/build.sh` screenshots it with the house `shot.mjs` (port 18796) and `build/pack.py` quantizes to `entry.png`.
+
+Layout (1024×1024, paper `#f4efe6`, ink `#1c140e`): Playfair masthead "Wednesday 18 November 2026", kicker "THE DAY IN WORLD NEWS", "40 STORIES · 6 CONTINENTS". Three lead cards (art slot 156px, Playfair headlines). Nine main cards in a 3×3 grid (40px illustration strip, 16px sans headlines, two-line deks). Bottom band: "WHERE IT HAPPENED" placeholder globe (real pins are session 3) beside "ALSO ON WEDNESDAY 18 NOVEMBER" (stories 13–40, two columns). Footer lists every source in the JSON plus a one-line judge note. Body is Source Sans Pro. All type is at least 11px; headlines are at least 16px.
+
+Checked on the packed image: no card text is cut off or overlapping. `entry.png` is 1024×1024, palette mode, 124 colours, 84,969 bytes.
+
+Next (session 3): replace each lead and main placeholder with the story's flat-vector `art`, draw the numbered world map from `lat`/`lon`, and spot-check the date and headlines at 300px. Do not add Tuesday events.
