@@ -33,8 +33,9 @@ function segs(n, x, y, h, fill) {
 }
 
 export function s6() {
-  return `<svg viewBox="0 0 320 40" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-<rect width="320" height="40" fill="${C}"/>
+  return `<svg viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+<rect width="320" height="65" fill="${C}"/>
+<g transform="translate(2,3) scale(1.48)">
 <path d="M40 4 h28 l8 7 -6 3 5 4 -5 2 -6 -3 -6 3 -4 7 -7 -3 -8 2 -6 -5 3 -4 -2 -5 8 -3 z" fill="${I}"/>
 <path d="M68 16 l8 7 3 12 -6 1 -3 -11 -5 -4 z" fill="${I}"/>
 <circle cx="16" cy="26" r="2.1" fill="${I}"/>
@@ -42,8 +43,9 @@ export function s6() {
 <circle cx="24" cy="22" r="1.8" fill="${I}"/>
 <rect x="96" y="5" width="26" height="30" fill="${T}" stroke="${I}" stroke-width="1.7"/>
 <path d="M101 20 l6 7 12 -14" fill="none" stroke="${R}" stroke-width="2.6"/>
-${segs(56, 132, 6, 28, I)}
-<rect x="178" y="18" width="12" height="4" fill="${I}"/>
-${segs(44, 196, 6, 28, I)}
+</g>
+${segs(56, 186, 10, 44, I)}
+<rect x="246" y="30" width="14" height="5" fill="${I}"/>
+${segs(44, 264, 10, 44, I)}
 </svg>`;
 }

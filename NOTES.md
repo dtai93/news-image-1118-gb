@@ -64,3 +64,15 @@ Scenes: China flag, open gate, podium, ring of 21 arrows; Kuwait flag, two struc
 `entry.png` is 1024×1024, palette, 124 colours, 88,919 bytes.
 
 Next: same treatment for stories 7–12, then the numbered world map from `lat`/`lon`. Do not add Tuesday events.
+
+## Session 3b — illustrations for stories 7–12
+
+Main illustration strips are 65px (were 40). Page rows are now 82 / 217 / 396 / 256 / 46. Lead art track is 140px so two-line deks still fit. Also-list lines are 16px so items 13–40 stay inside the shorter band.
+
+`build/art/s7.mjs`–`s12.mjs`, and s4–s6 redrawn for the taller strip. All twelve are registered in `build/art/index.mjs`.
+
+Scenes: syringe, measles spots, US / Mexico (Baja) / Bolivia silhouettes; sun, Australia, a draft marked 2030; three server racks with one gold lamp and a check; Union Jack, gavel, five houses; courtroom bench and a calendar reading 330; a pipeline from a western landmass toward an eastern one, with a valve and an arrow.
+
+Checked on `entry.png`: masthead, 2030, 330 and 56-44 read; main headlines and deks are intact; the also list runs 13–40. File is 1024×1024, palette, 123 colours, 90,756 bytes.
+
+Next: numbered world map from `lat`/`lon`, then spot-check the date and headlines at 300px. Do not add Tuesday events.

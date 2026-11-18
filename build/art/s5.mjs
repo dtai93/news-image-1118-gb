@@ -6,24 +6,23 @@ const R = '#8f1d1a';
 const W = '#fbf7f0';
 
 export function s5() {
-  return `<svg viewBox="0 0 320 40" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-<rect width="320" height="40" fill="${C}"/>
-<rect x="4" y="14" width="158" height="22" fill="${W}" stroke="${I}" stroke-width="1.5"/>
-<rect x="56" y="8" width="52" height="28" fill="${W}" stroke="${I}" stroke-width="1.5"/>
-<rect x="62" y="14" width="3.5" height="16" fill="${I}"/>
-<rect x="72" y="14" width="3.5" height="16" fill="${I}"/>
-<rect x="82" y="14" width="3.5" height="16" fill="${I}"/>
-<rect x="92" y="14" width="3.5" height="16" fill="${I}"/>
-<rect x="12" y="20" width="9" height="8" fill="${C}" stroke="${I}" stroke-width="1"/>
-<rect x="26" y="20" width="9" height="8" fill="${C}" stroke="${I}" stroke-width="1"/>
-<rect x="40" y="20" width="9" height="8" fill="${C}" stroke="${I}" stroke-width="1"/>
-<rect x="116" y="20" width="9" height="8" fill="${C}" stroke="${I}" stroke-width="1"/>
-<rect x="130" y="20" width="9" height="8" fill="${C}" stroke="${I}" stroke-width="1"/>
-<rect x="144" y="20" width="9" height="8" fill="${C}" stroke="${I}" stroke-width="1"/>
-<path d="M198 22 h112 v14 H198 Z" fill="${W}" stroke="${I}" stroke-width="1.7"/>
-<rect x="222" y="10" width="68" height="18" fill="${T}" stroke="${I}" stroke-width="1.5"/>
-<rect x="228" y="16" width="34" height="2.4" fill="${I}"/>
-<rect x="228" y="21" width="22" height="2" fill="${I}"/>
-<polygon points="186,4 186,14 178,14 192,26 206,14 198,14 198,4" fill="${R}"/>
+  return `<svg viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+<rect width="320" height="65" fill="${C}"/>
+<polygon points="48,22 96,4 144,22" fill="${W}" stroke="${I}" stroke-width="1.6"/>
+<rect x="8" y="30" width="176" height="26" fill="${W}" stroke="${I}" stroke-width="1.6"/>
+<rect x="62" y="18" width="68" height="38" fill="${W}" stroke="${I}" stroke-width="1.6"/>
+<rect x="70" y="26" width="5" height="24" fill="${I}"/>
+<rect x="84" y="26" width="5" height="24" fill="${I}"/>
+<rect x="98" y="26" width="5" height="24" fill="${I}"/>
+<rect x="112" y="26" width="5" height="24" fill="${I}"/>
+<rect x="16" y="38" width="12" height="10" fill="${C}" stroke="${I}" stroke-width="1.2"/>
+<rect x="34" y="38" width="12" height="10" fill="${C}" stroke="${I}" stroke-width="1.2"/>
+<rect x="142" y="38" width="12" height="10" fill="${C}" stroke="${I}" stroke-width="1.2"/>
+<rect x="160" y="38" width="12" height="10" fill="${C}" stroke="${I}" stroke-width="1.2"/>
+<polygon points="198,4 198,16 188,16 208,32 228,16 218,16 218,4" fill="${R}"/>
+<path d="M198 40 h114 v16 H198 Z" fill="${W}" stroke="${I}" stroke-width="1.8"/>
+<rect x="226" y="14" width="76" height="30" fill="${T}" stroke="${I}" stroke-width="1.6"/>
+<rect x="234" y="22" width="42" height="3.2" fill="${I}"/>
+<rect x="234" y="30" width="28" height="2.6" fill="${I}"/>
 </svg>`;
 }

@@ -31,7 +31,7 @@ const css = `
 *{box-sizing:border-box}
 html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:#f4efe6}
 .page{width:1024px;height:1024px;padding:6px 8px 5px;display:grid;
-  grid-template-rows:82px 240px 330px 299px 46px;gap:4px;
+  grid-template-rows:82px 217px 396px 256px 46px;gap:4px;
   background:#f4efe6;color:#1c140e;
   font-family:"Source Sans Pro",Inter,Roboto,"DejaVu Sans",sans-serif}
 .mast{display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
@@ -42,11 +42,11 @@ html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:#f4efe6
   font-weight:700;font-size:46px;line-height:50px;height:50px;letter-spacing:-.015em}
 .rules{height:6px;border-top:3px solid #1c140e;border-bottom:1px solid #1c140e;margin-top:3px}
 .leads,.mains{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;min-height:0}
-.mains{grid-template-rows:repeat(3,108px);gap:3px}
+.mains{grid-template-rows:repeat(3,130px);gap:3px}
 .lead,.main{border:1px solid #1c140e;background:#fbf7f0;min-height:0;overflow:hidden;
   display:grid;padding:4px 6px 3px;gap:2px}
-.lead{grid-template-rows:156px 14px 20px 1fr}
-.main{grid-template-rows:40px 13px 18px 1fr;padding:3px 5px 2px;gap:1px}
+.lead{grid-template-rows:140px 14px 20px 1fr}
+.main{grid-template-rows:65px 13px 18px 26px;padding:2px 5px 1px;gap:1px}
 .art{position:relative;overflow:hidden;background:#efe4cf;min-height:0}
 .art svg{display:block;width:100%;height:100%}
 .pin{position:absolute;top:3px;left:3px;background:#8f1d1a;color:#fbf7f0;
@@ -65,7 +65,7 @@ html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:#f4efe6
 .map-cap{position:absolute;left:8px;bottom:6px;margin:0;font-size:12px;line-height:14px;font-weight:700}
 .also-cols{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0 10px;min-height:0;margin-top:2px}
 .also-col+.also-col{border-left:1px solid #1c140e;padding-left:8px}
-.also-item{margin:0;font-size:12px;line-height:17px;height:17px;white-space:nowrap;overflow:hidden}
+.also-item{margin:0;font-size:12px;line-height:16px;height:16px;white-space:nowrap;overflow:hidden}
 .also-item b{color:#8f1d1a;font-weight:700}
 .foot{min-height:0;border-top:2px solid #1c140e;padding-top:3px}
 .foot p{margin:0;font-size:11px;line-height:13px}
