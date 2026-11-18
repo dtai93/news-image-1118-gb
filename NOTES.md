@@ -136,3 +136,15 @@ Facts, story set, and the newspaper grid are unchanged. Type and pictures are he
 `entry.png` is 1024×1024 palette, 86,832 bytes. Checked at full size and at 300px: date, lead headlines, also-list, and the four figures read; banner text is clear of the caption bars. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches `entry.png`.
 
 Next: change the picture only if a grade names a specific miss.
+
+## Session 8 — overlap fix
+
+Headline and dek spacing only, plus the map legend and the figures row. Story text is unchanged.
+
+- Card type uses a line height of at least 1.15 times the font size. The dek starts 3px under the last headline line's ink. A headline drops 1px, then 2px, before a dek is cut to two lines. The measured cards keep the full dek. The tightest small cards (Korea, sanctions, TAPI) end 4px or more above the border, with 5px or more between the headline and the dek.
+- Lead pictures are 98px tall (were 110) and small pictures 71px (were 73) so that line height fits inside the card. Headlines stay 22px on the leads. A few small headlines are 13–14px.
+- Under the map, the continent legend is first and "THE DAY IN FIGURES" is under it. Both sit inside the box and do not cover the land or each other.
+
+Checked at 1024 and on crops of the small cards: the named collisions (Korea, Alaska, Merchant, TAPI, lead deks, figures versus legend) are separated. `entry.png` is 1024×1024 palette, 88,781 bytes. `MAKEFUN_OUTPUT_DIR=out node main.ts` matches it.
+
+Next: change the picture only if a grade names a specific miss.

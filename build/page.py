@@ -169,6 +169,26 @@ def chip(d, right, top, label, font):
     d.text((x + 4, top + 4), label, font=font, fill=WHITE)
 
 
+def line_step(size):
+    """Line height is at least 1.15 times the font size."""
+    return max(1, math.ceil(size * 1.15))
+
+
+def place_lines(d, x, y, lines, fnt):
+    """Tops are a full line-step apart, and each line's ink clears the one above by 2px."""
+    step = line_step(fnt.size)
+    ys = []
+    for i, line in enumerate(lines):
+        cursor = y if not ys else ys[-1] + step
+        if ys:
+            prev_bottom = d.textbbox((x, ys[-1]), lines[i - 1], font=fnt)[3]
+            ink_off = d.textbbox((0, 0), line, font=fnt)[1]
+            cursor = max(cursor, prev_bottom + 2 - ink_off)
+        ys.append(cursor)
+    last = d.textbbox((x, ys[-1]), lines[-1], font=fnt)[3] if lines else y
+    return ys, last
+
+
 def tag(d, x, y, story, path, max_w, start):
     region = {"NORTH AMERICA": "N. AMERICA", "MIDDLE EAST": "M. EAST"}.get(story["region"], story["region"])
     label = f"{story['num']}  {region} · {story['field']}"
@@ -190,7 +210,8 @@ def card(base, _d, box, story, fonts, lead):
     col = rcol(story["region"])
     d.rounded_rectangle((0, 0, w - 1, h - 1), radius=4, fill=CREAM, outline=col, width=2)
     cap, chip_l, hl, dek = CARD[story["n"]]
-    text_h = 98 if lead else 92
+    # Room for a 1.15em headline, a 3px gap, and the dek, inside the card.
+    text_h = 104 if lead else 94
     art_h = max(44, h - text_h)
     art = (3, 3, w - 6, art_h)
     # Scene stops above the caption strip so picture text cannot be clipped by it.
@@ -199,18 +220,38 @@ def card(base, _d, box, story, fonts, lead):
     cfont = fit(fonts["sansb"], cap, art[2], 13 if lead else 10, 8, d)
     caption(d, art, cap, cfont)
     chip(d, w - 3, 3, chip_l, fonts["chip"])
-    ty = 5 + art_h
+    ty = 3 + art_h
     tf = tag(d, 6, ty, story, fonts["sansb"], w - 14, 13 if lead else 11)
-    top = ty + tf.size + 1
-    hf = fit(fonts["serif"], hl, w - 14, 22 if lead else 15, 11, d, 900)
-    for i, line in enumerate(hl.split("\n")[:2]):
-        d.text((6, top + i * (hf.size + 1)), line, font=hf, fill=HEAD)
-    dy = top + 2 * (hf.size + 1) + 1
+    top = ty + tf.size
+    max_w = w - 14
+    hlines = hl.split("\n")[:2]
     df = fonts["dek"] if lead else fonts["dek_s"]
-    for i, line in enumerate(wrap(d, dek, df, w - 14)[:3]):
-        if dy + i * (df.size + 1) + df.size > h - 3:
+    full = wrap(d, dek, df, max_w) or [dek]
+    start = 22 if lead else 15
+    # Keep every dek line. Shrink the headline by 1px, then 2px, before trimming the dek.
+    picked = None
+    for limit in (len(full), min(len(full), 2)):
+        for shrink in (0, 1, 2):
+            hf = fit(fonts["serif"], "\n".join(hlines), max_w, start - shrink, 11, d, 900)
+            hys, hbot = place_lines(d, 6, top, hlines, hf)
+            dlines = full[:limit]
+            dys, dbot = place_lines(d, 6, hbot + 3, dlines, df)
+            if dbot <= h - 4:
+                picked = (hf, hys, dys, dlines)
+                break
+        if picked:
             break
-        d.text((6, dy + i * (df.size + 1)), line, font=df, fill=(22, 14, 10))
+    if picked is None:
+        hf = fit(fonts["serif"], "\n".join(hlines), max_w, max(11, start - 2), 11, d, 900)
+        hys, hbot = place_lines(d, 6, top, hlines, hf)
+        dlines = full[:2]
+        dys, _dbot = place_lines(d, 6, hbot + 3, dlines, df)
+        picked = (hf, hys, dys, dlines)
+    hf, hys, dys, dlines = picked
+    for yy, line in zip(hys, hlines):
+        d.text((6, yy), line, font=hf, fill=HEAD)
+    for yy, line in zip(dys, dlines):
+        d.text((6, yy), line, font=df, fill=(22, 14, 10))
     base.paste(layer, (x, y))
 
 
@@ -310,25 +351,45 @@ def render():
     paint_land(im, map_box)
     pins(d, (map_box[0], map_box[1]), map_box[2], map_box[3], illustrated, also,
          font(sans, 10, 700))
-    fy = map_box[1] + map_h + 3
-    d.text((16, fy), "THE DAY IN FIGURES", font=font(sans, 11, 700), fill=RUST)
-    figures = [("21", "ECONOMIES"), ("$116BN", "REVENUE"), ("56–44", "SENATE"), ("330", "MONTHS")]
-    nf = font(serif, 16, 900)
-    cf = font(sans, 9, 700)
-    slot = (map_right - 24) / 4
-    for i, (num, cap) in enumerate(figures):
-        cx = 16 + i * slot + slot / 2
-        tw = d.textlength(num, font=nf)
-        d.text((cx - tw / 2, fy + 13), num, font=nf, fill=HEAD)
-        tw = d.textlength(cap, font=cf)
-        d.text((cx - tw / 2, fy + 31), cap, font=cf, fill=HEAD)
-    lf = font(sans, 12, 700)
-    leg_y = fy + 46
+    # Legend sits directly under the map. Figures sit under the legend, inside the box.
+    box_bottom = bottom_y + bottom_h - 6
+    leg_top = map_box[1] + map_h + 4
+    lf_size, title_size, num_size, cap_size = 12, 11, 16, 9
+    while True:
+        lstep = line_step(lf_size)
+        title_y = leg_top + 2 * lstep + 4
+        num_y = title_y + line_step(title_size) + 2
+        cap_y = num_y + line_step(num_size) + 2
+        end = cap_y + line_step(cap_size)
+        if end <= box_bottom or num_size <= 13:
+            break
+        num_size -= 1
+    lf = font(sans, lf_size, 700)
+    tf = font(sans, title_size, 700)
+    nf = font(serif, num_size, 900)
+    cf = font(sans, cap_size, 700)
     for i, (name, col) in enumerate(REG.items()):
         lx = 16 + (i % 3) * 128
-        ly = leg_y + (i // 3) * 16
-        d.ellipse((lx, ly + 2, lx + 10, ly + 12), fill=col)
+        ly = leg_top + (i // 3) * lstep
+        d.ellipse((lx, ly + 2, lx + 9, ly + 11), fill=col)
         d.text((lx + 13, ly), name, font=lf, fill=HEAD)
+    d.text((16, title_y), "THE DAY IN FIGURES", font=tf, fill=RUST)
+    figures = [("21", "ECONOMIES"), ("$116BN", "REVENUE"), ("56–44", "SENATE"), ("330", "MONTHS")]
+    title_bot = d.textbbox((16, title_y), "THE DAY IN FIGURES", font=tf)[3]
+    num_off = min(d.textbbox((0, 0), num, font=nf)[1] for num, _cap in figures)
+    num_y = max(num_y, title_bot + 3 - num_off)
+    slot = (map_right - 24) / 4
+    for i, (num, _cap) in enumerate(figures):
+        cx = 16 + i * slot + slot / 2
+        tw = d.textlength(num, font=nf)
+        d.text((cx - tw / 2, num_y), num, font=nf, fill=HEAD)
+    num_bot = max(d.textbbox((0, num_y), num, font=nf)[3] for num, _cap in figures)
+    cap_off = d.textbbox((0, 0), "ECONOMIES", font=cf)[1]
+    cap_y = max(cap_y, num_bot + 3 - cap_off)
+    for i, (_num, cap) in enumerate(figures):
+        cx = 16 + i * slot + slot / 2
+        tw = d.textlength(cap, font=cf)
+        d.text((cx - tw / 2, cap_y), cap, font=cf, fill=HEAD)
     ax = 414
     d.rounded_rectangle((ax, bottom_y, 1016, bottom_y + bottom_h), radius=4, outline=(176, 164, 146), width=1)
     d.text((ax + 8, bottom_y + 3), "ALSO ON WEDNESDAY 18 NOVEMBER", font=hfont, fill=HEAD)
