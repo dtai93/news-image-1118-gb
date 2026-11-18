@@ -52,3 +52,15 @@ Layout (1024×1024, paper `#f4efe6`, ink `#1c140e`): Playfair masthead "Wednesda
 Checked on the packed image: no card text is cut off or overlapping. `entry.png` is 1024×1024, palette mode, 124 colours, 84,969 bytes.
 
 Next (session 3): replace each lead and main placeholder with the story's flat-vector `art`, draw the numbered world map from `lat`/`lon`, and spot-check the date and headlines at 300px. Do not add Tuesday events.
+
+## Session 3a — illustrations for stories 1–6
+
+`build/art/s1.mjs`–`s6.mjs` each export a flat SVG from that story's `art` line. `build/art/index.mjs` maps those six and leaves every other card on the old placeholder. `build/render.mjs` draws leads and mains through `artFor`.
+
+Scenes: China flag, open gate, podium, ring of 21 arrows; Kuwait flag, two struck drones, radar over the coast; green chip, crossed return arrow, bar 116; China and Korea flags, peninsula, three linked chips; White House and a nameplate into a tray; Alaska, a ballot, 56-44.
+
+`build/pack.py` keeps flag gold `#f0c400` and Korea blue `#1a56c4` in the palette. Without that, median-cut turned the stars pink and the taegeuk green. Checked on `entry.png`: stars are yellow, Kuwait's trapezoid is correct, the taegeuk is red over blue, 116 and 56-44 read.
+
+`entry.png` is 1024×1024, palette, 124 colours, 88,919 bytes.
+
+Next: same treatment for stories 7–12, then the numbered world map from `lat`/`lon`. Do not add Tuesday events.
